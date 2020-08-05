@@ -1,0 +1,12 @@
+container: deeplabv3_resnet50
+
+dataset:
+  base: /dgx/data/raw_dataset/data
+  train:
+    - name: 20200610093341_H_ws2tobu_anomaly
+      has_kizu: 1
+  test:
+    - name: 20200610093341_H_ws2tobu_anomaly
+      has_kizu: 1
+    - name: 20200610093341_H_ws2tobu_normal
+      has_kizu: 0

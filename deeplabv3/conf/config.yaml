@@ -1,0 +1,3 @@
+defaults:
+  - yamls: somic
+  - yamls: user_conf
