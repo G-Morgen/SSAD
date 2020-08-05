@@ -7,8 +7,8 @@ transform:
   p: 1.0
   transforms:
   - __class_fullname__: albumentations.augmentations.transforms.Resize
-    height: 64
-    width: 64
+    height: 256
+    width: 256
     interpolation: 1
     always_apply: false
     p: 1
