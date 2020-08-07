@@ -6,12 +6,21 @@ transform:
   keypoint_params: null
   p: 1.0
   transforms:
-  - __class_fullname__: albumentations.augmentations.transforms.Resize
-    height: 256
-    width: 256
-    interpolation: 1
+  - __class_fullname__: albumentations.augmentations.transforms.CLAHE
     always_apply: false
+    clip_limit:
+    - 1
+    - 4.0
     p: 1
+    tile_grid_size:
+    - 8
+    - 8
+  - __class_fullname__: albumentations.augmentations.transforms.Resize
+    always_apply: false
+    height: 256
+    interpolation: 1
+    p: 1
+    width: 256
   - __class_fullname__: albumentations.augmentations.transforms.Normalize
     always_apply: false
     max_pixel_value: 255.0

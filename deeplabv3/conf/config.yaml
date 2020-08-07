@@ -1,3 +1,78 @@
-defaults:
-  - yamls: somic
-  - yamls: user_conf
+device: cuda:0
+
+run_train:
+  epoch: 50
+
+dataset:
+  S:
+    base: /dgx/data/raw_dataset/data
+    query:
+      - folder == '20200610093341_H_ws2tobu_anomaly' &
+        has_kizu == 1 &
+        data_type == 'train'
+  C:
+    base: /dgx/data/raw_dataset/data
+    query:
+      - folder == '20200610093341_H_ws2tobu_anomaly' &
+        has_kizu == 1 &
+        data_type == 'train'
+      - folder == '20200611140608_H_ws2tobu_normal' &
+        has_kizu == 0 &
+        data_type == 'train'
+  test:
+    base: /dgx/data/raw_dataset/data
+    query:
+      - folder == '20200610093341_H_ws2tobu_anomaly' &
+        has_kizu == 1 &
+        data_type == 'test'
+      - folder == '20200610093341_H_ws2tobu_anomaly' &
+        has_kizu == 0 &
+        data_type == 'test'
+      - folder == '20200611140608_H_ws2tobu_normal' &
+        has_kizu == 0 &
+        data_type == 'test'
+
+dataloader:
+  S:
+    batch_size: 32
+    shuffle: True
+  C:
+    batch_size: 32
+    shuffle: True
+  test:
+    batch_size: 1
+    shuffle: True
+
+model:
+  S:
+    name: DeepLabV3
+    pth:
+  C:
+    name: VGG19
+    pth:
+
+augs:
+  S: /dgx/github/DeepLabV3/deeplabv3/conf/augs/train_semseg.yaml
+  C: /dgx/github/DeepLabV3/deeplabv3/conf/augs/train_classifier.yaml
+  test: /dgx/github/DeepLabV3/deeplabv3/conf/augs/test.yaml
+
+optimizer:
+  S:
+    name: Adam
+    args:
+      lr: 0.0002
+      weight_decay: 0.00001
+  C:
+    name: Adam
+    args:
+      lr: 0.0002
+      weight_decay: 0.00001
+
+criterion:
+  S:
+    name: CrossEntropy2D
+    args:
+      reduction: mean
+  C:
+    name: CrossEntropyLoss
+    args:

@@ -16,7 +16,12 @@ def my_app(cfg: T.DictConfig) -> None:
 
     os.rename(".hydra", "hydra")
     trainer = Trainer(cfg)
-    trainer.run_train()
+
+    if cfg.model.S.pth and cfg.model.C.pth:
+        trainer.load_model_pth()
+    else:
+        trainer.run_train()
+
     trainer.run_test()
 
 

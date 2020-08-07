@@ -1,11 +1,13 @@
-import albumentations as albu
-import torch
 import matplotlib.pyplot as plt
+import pandas as pd
+import torch
+from mpl_toolkits.axes_grid1 import ImageGrid
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-import deeplabv3.models
 import deeplabv3.typehint as T
+import deeplabv3.models
+import deeplabv3.losses
 from deeplabv3 import albu
 from deeplabv3.dataset import SomicDataset
 
@@ -17,100 +19,161 @@ class Trainer:
         self.cfg = cfg
 
         self.augs = {}
-        self.augs["train"] = self.get_augs(train_or_test="train")
-        self.augs["test"] = self.get_augs(train_or_test="test")
-
+        self.dataset = {}
         self.dataloader = {}
-        self.dataloader["train"] = self.get_dataloader(train_or_test="train")
-        self.dataloader["test"] = self.get_dataloader(train_or_test="test")
-        self.model = self.get_model()
-        self.model = self.model.to(self.cfg.device)
-        self.optimizer = self.get_optimizer()
-        self.criterion = self.get_criterion()
+        for data_type in ["S", "C", "test"]:
+            self.augs[data_type] = self.get_augs(data_type)
+            self.dataset[data_type] = self.get_dataset(data_type)
+            self.dataloader[data_type] = self.get_dataloader(data_type)
 
-    def get_model(self) -> T.Module:
+        self.model = {}
+        self.optimizer = {}
+        self.criterion = {}
+        for data_type in ["S", "C"]:
+            self.model[data_type] = self.get_model(data_type)
+            self.optimizer[data_type] = self.get_optimizer(data_type)
+            self.criterion[data_type] = self.get_criterion(data_type)
 
-        return deeplabv3.models.DeepLabV3()
+    def get_augs(self, data_type: str) -> T.Compose:
 
-    def get_augs(self, train_or_test: str) -> T.Compose:
+        return albu.load(self.cfg.augs[data_type], data_format="yaml")
 
-        return albu.load(self.cfg[train_or_test]["augs"], data_format="yaml")
+    def get_dataset(self, data_type: str):
 
-    def get_dataloader(self, train_or_test: str) -> T.DataLoader:
+        return SomicDataset(self.cfg.dataset[data_type], self.augs[data_type])
 
-        dataset = SomicDataset(
-            cfg=self.cfg, train_or_test=train_or_test, augs=self.augs[train_or_test]
-        )
+    def get_dataloader(self, data_type: str) -> T.DataLoader:
+
         dataloader = DataLoader(
-            dataset=dataset, batch_size=self.cfg[train_or_test].batch_size, shuffle=True
+            dataset=self.dataset[data_type],
+            batch_size=self.cfg.dataloader[data_type].batch_size,
+            shuffle=self.cfg.dataloader[data_type].shuffle,
         )
         return dataloader
 
-    def get_optimizer(self) -> T.Optimizer:
+    def get_model(self, data_type: str):
 
-        parameters = self.model.parameters()
-        lr = self.cfg.train.optim.lr
-        weight_decay = self.cfg.train.optim.weight_decay
-        optimizer = torch.optim.Adam(parameters, lr=lr, weight_decay=weight_decay)
-        return optimizer
+        model = getattr(deeplabv3.models, self.cfg.model[data_type].name)
+        return model().to(self.cfg.device)
 
-    def get_criterion(self) -> T.Loss:
+    def get_optimizer(self, data_type: str) -> T.Optimizer:
 
-        return torch.nn.MSELoss(reduction="mean")
+        params = self.model[data_type].parameters()
+        optimizer = getattr(torch.optim, self.cfg.optimizer[data_type].name)
+        args = self.cfg.optimizer[data_type].args
+        if args:
+            return optimizer(params, **args)
+        else:
+            return optimizer(params)
+
+    def get_criterion(self, data_type: str):
+
+        criterion = getattr(deeplabv3.losses, self.cfg.criterion[data_type].name)
+        args = self.cfg.criterion[data_type].args
+        if args:
+            return criterion(**args)
+        else:
+            return criterion()
+
+    def load_model_pth(self) -> None:
+
+        self.model["S"].load_state_dict(torch.load(self.cfg.model.S.pth))
+        self.model["C"].load_state_dict(torch.load(self.cfg.model.C.pth))
 
     def run_train(self) -> None:
 
-        self.model.train()
-        pbar = tqdm(range(self.cfg.train.epochs), desc="train")
+        pbar = tqdm(range(self.cfg.run_train.epoch), desc="train")
         for epoch in pbar:
-            for sample in self.dataloader["train"]:
-                img = sample["image"].to(self.cfg.device)
-                mask = sample["mask"].float().to(self.cfg.device)
-                pred = self.model(img)["out"]
-                loss = self.criterion(pred, mask)
+
+            # Train semseg model
+            self.model["S"].train()
+            self.model["C"].train()
+            for data in self.dataloader["S"]:
+                img = data["image"].to(self.cfg.device)
+                mask = data["mask"].long().to(self.cfg.device)
+                semseg = self.model["S"](img)
+                loss = self.criterion["S"](semseg, mask)
                 loss.backward()
-                self.optimizer.step()
-                self.optimizer.zero_grad()
+                self.optimizer["S"].step()
+                self.optimizer["S"].zero_grad()
+
+            # Train classifier
+            self.model["S"].eval()
+            self.model["C"].train()
+            for data in self.dataloader["C"]:
+                img = data["image"].to(self.cfg.device)
+                label = data["label"].to(self.cfg.device)
+
+                with torch.no_grad():
+                    semseg = self.model["S"](img)
+
+                pred = self.model["C"](semseg)
+                loss = self.criterion["C"](pred, label)
+                loss.backward()
+                self.optimizer["C"].step()
+                self.optimizer["C"].zero_grad()
+
+        torch.save(self.model["S"].state_dict(), "semseg.pth")
+        torch.save(self.model["C"].state_dict(), "classifier.pth")
 
     def run_test(self) -> None:
 
-        self.model.eval()
+        self.model["S"].eval()
+        self.model["C"].eval()
+        di: dict = {"label": [], "pred": [], "stem": []}
         pbar = tqdm(self.dataloader["test"], desc="test")
-        for idx, sample in enumerate(pbar):
+        for idx, data in enumerate(pbar):
             with torch.no_grad():
-                img = sample["image"].to(self.cfg.device)
-                mask = sample["mask"].to(self.cfg.device)
-                pred = self.model(img)["out"]
-                self.show_test_result(idx, img, mask, pred)
+                img = data["image"].to(self.cfg.device)
+                mask = data["mask"].to(self.cfg.device)
+                label = data["label"].item()
+                stem = data["stem"][0]
 
-    def show_test_result(self, idx: int, img: T.Tensor, mask: T.Tensor, pred: T.Tensor) -> None:
+                semseg = self.model["S"](img)
+                pred = self.model["C"](semseg)
+
+                semseg = torch.argmax(semseg, 1)
+                pred = torch.argmax(pred).item()
+
+                di["label"].append(label)
+                di["pred"].append(pred)
+                di["stem"].append(stem)
+
+                self.show_test_result(stem, img, mask, label, semseg, pred)
+
+        df = pd.DataFrame(di)
+        df.to_csv("result.csv")
+
+    def show_test_result(
+        self, stem: str, img: T.Tensor, mask: T.Tensor, label: int, semseg: T.Tensor, pred: int,
+    ) -> None:
 
         img = self.unnormalize(img.squeeze())
         img = img.permute(1, 2, 0).cpu().numpy()
         mask = mask.squeeze().cpu().numpy()
-        pred = pred.squeeze().cpu().numpy()
+        semseg = semseg.squeeze().cpu().numpy()
 
         plt.figure(figsize=(12, 4))
+
         plt.subplot(131)
         plt.imshow(img)
+        plt.title("Image")
         plt.tick_params(labelbottom=False, labelleft=False, bottom=False, left=False)
 
         plt.subplot(132)
         plt.imshow(img)
-        plt.imshow(mask, cmap="Reds", alpha=0.5)
+        plt.imshow(mask, alpha=0.3, cmap="Reds")
+        plt.title(f"Mask (Label={label})")
         plt.tick_params(labelbottom=False, labelleft=False, bottom=False, left=False)
 
         plt.subplot(133)
         plt.imshow(img)
-        plt.imshow(pred, cmap="jet", alpha=0.5)
+        plt.imshow(semseg, alpha=0.3, cmap="Reds")
+        plt.title(f"Semseg (Pred={pred})")
         plt.tick_params(labelbottom=False, labelleft=False, bottom=False, left=False)
 
-        plt.tight_layout()
-        plt.savefig(f"{idx}_test_result.png")
-
-        print(img.shape)
-        print(mask.shape)
-        print(pred.shape)
+        plt.savefig(f"{stem}.png", bbox_inches="tight")
+        plt.close()
 
     def unnormalize(self, tensor: T.Tensor) -> T.Tensor:
 
