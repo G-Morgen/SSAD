@@ -1,10 +1,10 @@
 import torch
 from torch.utils.data import DataLoader
 
-import deeplabv3.typehint as T
-import deeplabv3.models
-from deeplabv3 import albu
-from deeplabv3.dataset import SomicDataset
+import ssad.typehint as T
+import ssad.models
+from ssad import albu
+from ssad.dataset import SomicDataset
 
 
 class Trainer:

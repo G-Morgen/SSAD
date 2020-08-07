@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
-import deeplabv3.typehint as T
+import ssad.typehint as T
 
 
 class CrossEntropy2D(nn.Module):

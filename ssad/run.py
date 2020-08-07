@@ -3,8 +3,8 @@ import sys
 
 import hydra
 
-import deeplabv3.typehint as T
-from deeplabv3.trainer import Trainer
+import ssad.typehint as T
+from ssad.trainer import Trainer
 
 
 config_path = sys.argv[1]

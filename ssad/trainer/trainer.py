@@ -5,9 +5,9 @@ from mpl_toolkits.axes_grid1 import ImageGrid
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-import deeplabv3.typehint as T
-import deeplabv3.models
-import deeplabv3.losses
+import ssad.typehint as T
+import ssad.models
+import ssad.losses
 from deeplabv3 import albu
 from deeplabv3.dataset import SomicDataset
 
