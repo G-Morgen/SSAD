@@ -1,21 +1,22 @@
 from pathlib import Path
 
-import albumentations as albu
 import cv2
 import numpy as np
 import pandas as pd
 from torch.utils.data import Dataset
 
+import ssad.typehint as T
+
 
 class SomicDataset(Dataset):
-    def __init__(self, dataset_dict: dict, augs: albu.Compose) -> None:
+    def __init__(self, cfg: T.DictConfig, augs: T.Compose) -> None:
 
         self.augs = augs
-        self.base = Path(dataset_dict["base"])
+        self.base = Path(cfg["base"])
         self.stems = []
 
         df = pd.read_csv(self.base / "info.csv")
-        for query in dataset_dict["query"]:
+        for query in cfg["query"]:
             stem = df.query(query)["stem"]
             self.stems += stem.to_list()
 

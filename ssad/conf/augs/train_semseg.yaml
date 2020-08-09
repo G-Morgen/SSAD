@@ -46,24 +46,10 @@ transform:
       p: 1
   - __class_fullname__: albumentations.augmentations.transforms.Resize
     always_apply: false
-    height: 384
+    height: 256
     interpolation: 1
     p: 1
-    width: 384
-  - __class_fullname__: albumentations.core.composition.OneOf
-    p: 1
-    transforms:
-    - __class_fullname__: albumentations.augmentations.transforms.RandomCrop
-      always_apply: false
-      height: 256
-      p: 1
-      width: 256
-    - __class_fullname__: albumentations.augmentations.transforms.Resize
-      always_apply: false
-      height: 256
-      interpolation: 1
-      p: 1
-      width: 256
+    width: 256
   - __class_fullname__: albumentations.augmentations.transforms.Normalize
     always_apply: false
     max_pixel_value: 255.0

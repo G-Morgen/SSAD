@@ -14,6 +14,7 @@ class CrossEntropy2D(nn.Module):
         n, c, h, w = prediction.size()
         prediction = prediction.permute(0, 2, 3, 1).contiguous()
         prediction = prediction.view(-1, c)
+        target = target.long()
         target = target.view(-1)
         target[target != 0] = 1
         loss = F.cross_entropy(prediction, target, reduction=self.reduction)
