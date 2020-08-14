@@ -1,4 +1,4 @@
-import torch
+from sklearn.metrics import jaccard_score
 
 import ssad.typehint as T
 
@@ -6,8 +6,7 @@ import ssad.typehint as T
 class TrainerMetric:
     def compute_IoU(self, semseg: T.Tensor, mask: T.Tensor) -> float:
 
-        eps = 1e-10
-        intersection = torch.sum(semseg + mask == 2)
-        union = torch.sum(semseg + mask != 0)
-        iou = intersection / (union + eps)
-        return iou.item()
+        semseg = semseg.squeeze().cpu().numpy()
+        mask = mask.squeeze().cpu().numpy()
+        mask[mask != 0] = 1
+        return jaccard_score(mask.flatten(), semseg.flatten(), average="binary")

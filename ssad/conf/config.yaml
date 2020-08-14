@@ -6,39 +6,41 @@ run_train:
 
 dataset:
   S:
-    base: /dgx/data/raw_dataset/data
+    base: /dgx/github/DVC/data/dataset
     query:
-      - folder == '20200610093341_H_ws2tobu_anomaly' &
-        has_kizu == 1 &
-        data_type == 'train'
+      - product_type == 'H' &
+        is_anomaly_image == 1 &
+        is_train == 1 &
+        is_test == 0
   C:
-    base: /dgx/data/raw_dataset/data
+    base: /dgx/github/DVC/data/dataset
     query:
-      - folder == '20200610093341_H_ws2tobu_anomaly' &
-        has_kizu == 1 &
-        data_type == 'train'
-      - folder == '20200611140608_H_ws2tobu_normal' &
-        has_kizu == 0 &
-        data_type == 'train'
+      - product_type == 'H' &
+        is_anomaly_image == 1 &
+        is_train == 1 &
+        is_test == 0
+      - product_type == 'H' &
+        is_anomaly_image == 0 &
+        is_train == 1 &
+        is_test == 0
   test:
-    base: /dgx/data/raw_dataset/data
+    base: /dgx/github/DVC/data/dataset
     query:
-      - folder == '20200610093341_H_ws2tobu_anomaly' &
-        has_kizu == 1 &
-        data_type == 'test'
-      - folder == '20200610093341_H_ws2tobu_anomaly' &
-        has_kizu == 0 &
-        data_type == 'test'
-      - folder == '20200611140608_H_ws2tobu_normal' &
-        has_kizu == 0 &
-        data_type == 'test'
+      - product_type == 'H' &
+        is_anomaly_image == 1 &
+        is_train == 0 &
+        is_test == 1
+      - product_type == 'H' &
+        is_anomaly_image == 0 &
+        is_train == 0 &
+        is_test == 1
 
 dataloader:
   S:
-    batch_size: 32
+    batch_size: 16
     shuffle: True
   C:
-    batch_size: 32
+    batch_size: 16
     shuffle: True
   test:
     batch_size: 1
@@ -68,8 +70,6 @@ augs:
       Resize:
         height: ${augs.height}
         width: ${augs.width}
-      Normalize:
-        p: 1
   C:
     yaml: /dgx/github/SSAD/ssad/conf/augs/train_classifier.yaml
     args:

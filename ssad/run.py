@@ -18,7 +18,7 @@ def my_app(cfg: T.DictConfig) -> None:
     trainer = Trainer(cfg)
 
     if cfg.model.S.pth and cfg.model.C.pth:
-        trainer.load_model_pth()
+        trainer.load_pretrained_model()
     else:
         trainer.run_train()
 

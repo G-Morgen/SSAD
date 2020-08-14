@@ -14,7 +14,7 @@ class Board(
 ):
     def __init__(self, base: Path):
 
-        self.base = base
+        self.base = self.init_base()
         self.cfg = self.init_config()
         self.S_loss, self.C_loss = self.init_loss()
         self.classifier_result = self.init_confusion_matrix()

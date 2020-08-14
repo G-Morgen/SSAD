@@ -14,16 +14,17 @@ class BoardConfusionMatrix:
         with open(self.base / "run.log", "r") as f:
             lines = f.readlines()
 
-        di: dict = {"stem": [], "label": [], "pred": []}
+        di: dict = {"stem": [], "label": [], "pred": [], "IoU": []}
         for line in lines:
             line = line.replace("\n", "")
             func_name = line.split(" - ")[1]
 
             if func_name == "run_test":
-                _, _, stem, label, pred, _ = line.split(" - ")
+                _, _, stem, label, pred, IoU = line.split(" - ")
                 di["stem"].append(stem)
                 di["label"].append(int(label))
                 di["pred"].append(int(pred))
+                di["IoU"].append(float(IoU))
 
         df = pd.DataFrame(di)
         df["angle"] = df["stem"].apply(lambda x: int(x.split("_")[-1]))
@@ -62,3 +63,6 @@ class BoardConfusionMatrix:
         cm["specificity"] = cm.TN / (cm.TN + cm.FP)
         cm["precision"] = cm.TP / (cm.TP + cm.FP)
         st.dataframe(cm)
+
+        mIoU = self.classifier_result.query("label==1")["IoU"].mean().item()
+        st.write(f"mIoU = {mIoU}")
