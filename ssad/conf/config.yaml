@@ -6,13 +6,13 @@ run_train:
 
 dataset:
   S:
-    base: /app/github_actions/DVC/data/dataset
+    base: /app/github_actions/DVC/dataset
     query:
       - product_type == 'H' &
         is_anomaly_image == 1 &
         data_type == 'train'
   C:
-    base: /app/github_actions/DVC/data/dataset
+    base: /app/github_actions/DVC/dataset
     query:
       - product_type == 'H' &
         is_anomaly_image == 1 &
@@ -21,7 +21,7 @@ dataset:
         is_anomaly_image == 0 &
         data_type == 'train'
   test:
-    base: /app/github_actions/DVC/data/dataset
+    base: /app/github_actions/DVC/dataset
     query:
       - product_type == 'H' &
         is_anomaly_image == 1 &
@@ -60,19 +60,19 @@ augs:
   height: 64
   width: 64
   S:
-    yaml: /dgx/github/SSAD/ssad/conf/augs/train_semseg.yaml
+    yaml: /app/github_actions/SSAD/ssad/conf/augs/train_semseg.yaml
     args:
       Resize:
         height: ${augs.height}
         width: ${augs.width}
   C:
-    yaml: /dgx/github/SSAD/ssad/conf/augs/train_classifier.yaml
+    yaml: /app/github_actions/SSAD/ssad/conf/augs/train_classifier.yaml
     args:
       Resize:
         height: ${augs.height}
         width: ${augs.width}
   test:
-    yaml: /dgx/github/SSAD/ssad/conf/augs/test.yaml
+    yaml: /app/github_actions/SSAD/ssad/conf/augs/test.yaml
     args:
       Resize:
         height: ${augs.height}

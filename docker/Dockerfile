@@ -23,7 +23,7 @@ ARG PYTHON_VERSION=3.6.5
 ENV PATH /opt/conda/bin:$PATH
 ENV PATH /usr/local/cuda-10.2/bin:$PATH
 ENV LD_LIBRARY_PATH /usr/local/cuda-10.2/lib64:$LD_LIBRARY_PATH
-ENV PYTHONPATH /dgx/github/SSAD:$PYTHONPATH
+ENV PYTHONPATH /app/github_actions/SSAD:$PYTHONPATH
 
 COPY requirements_pip.txt requirements_pip.txt
 RUN set -xe \
