@@ -1,39 +1,34 @@
 device: cuda:0
 
 run_train:
-  epoch: 100
+  epoch: 10
   grad_enabled: False
 
 dataset:
   S:
-    base: /dgx/github/DVC/data/dataset
+    base: /app/github_actions/DVC/data/dataset
     query:
       - product_type == 'H' &
         is_anomaly_image == 1 &
-        is_train == 1 &
-        is_test == 0
+        data_type == 'train'
   C:
-    base: /dgx/github/DVC/data/dataset
+    base: /app/github_actions/DVC/data/dataset
     query:
       - product_type == 'H' &
         is_anomaly_image == 1 &
-        is_train == 1 &
-        is_test == 0
+        data_type == 'train'
       - product_type == 'H' &
         is_anomaly_image == 0 &
-        is_train == 1 &
-        is_test == 0
+        data_type == 'train'
   test:
-    base: /dgx/github/DVC/data/dataset
+    base: /app/github_actions/DVC/data/dataset
     query:
       - product_type == 'H' &
         is_anomaly_image == 1 &
-        is_train == 0 &
-        is_test == 1
+        data_type == 'test'
       - product_type == 'H' &
         is_anomaly_image == 0 &
-        is_train == 0 &
-        is_test == 1
+        data_type == 'test'
 
 dataloader:
   S:
@@ -62,8 +57,8 @@ model:
       out_features: 2
 
 augs:
-  height: 256
-  width: 256
+  height: 64
+  width: 64
   S:
     yaml: /dgx/github/SSAD/ssad/conf/augs/train_semseg.yaml
     args:
