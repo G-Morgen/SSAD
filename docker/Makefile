@@ -1,11 +1,13 @@
 
 build:
-		docker build -t SSAD .
+		docker build -t ssad:latest .
 
 run:
-		docker run --runtime nvidia -it --rm \
-			--workdir /app/github \
+		docker run --runtime nvidia -it --rm --privileged \
+			--network host \
+			--workdir /app/github_actions \
+			--volume /home/inoue/.ssh:/tmp/.ssh:ro \
 			--volume ~/github_actions:/app/github_actions \
-			--name SSAD \
-			--hostname SSAD \
-			SSAD
+			--name ssad \
+			--hostname ssad \
+			ssad:latest

@@ -10,7 +10,13 @@ RUN set -xe \
         && apt update -y \
         && apt install -y --no-install-recommends $(cat requirements_apt.txt) \
         && rm -rf /var/lib/apt/lists/* \
-        && rm requirements_apt.txt \
+        && rm requirements_apt.txt
+
+
+RUN set -xe \
+        && wget https://dvc.org/deb/dvc.list -O /etc/apt/sources.list.d/dvc.list \
+        && apt update -y \
+        && apt install dvc
 
 
 ARG PYTHON_VERSION=3.6.5

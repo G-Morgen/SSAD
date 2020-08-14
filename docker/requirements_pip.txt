@@ -23,3 +23,5 @@ flake8
 mypy
 nptyping
 streamlit
+labelme==3.16.7
+pyqt5

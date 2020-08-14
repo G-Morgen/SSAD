@@ -1,3 +1,4 @@
+cp /tmp/.ssh /root/.ssh -r
 mkdir -p /dgx/github
 mkdir -p /dgx/data
 mkdir -p /dgx/shared/momo
