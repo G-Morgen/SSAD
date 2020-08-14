@@ -7,6 +7,4 @@ run:
 			--network host \
 			--workdir /app/github_actions \
 			--volume ~/github_actions:/app/github_actions \
-			--name ssad \
-			--hostname ssad \
 			ssad:latest
