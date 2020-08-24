@@ -3,6 +3,9 @@ from ssad import albu
 
 
 class TrainerAugs:
+
+    cfg: T.Path
+
     def init_augs(self, data_type: str) -> T.Compose:
 
         augs = albu.load(self.cfg.augs[data_type].yaml, data_format="yaml")

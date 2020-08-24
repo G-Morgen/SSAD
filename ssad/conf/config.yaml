@@ -1,33 +1,36 @@
 device: cuda:0
 
 run_train:
-  epoch: 10
+  epoch: 100
   grad_enabled: False
 
 dataset:
   S:
-    base: /app/github_actions/DVC/dataset
+    base: /dgx/data/raw_dataset/data
     query:
-      - product_type == 'H' &
-        is_anomaly_image == 1 &
+      - folder == '20200610093341_H_ws2tobu_anomaly' &
+        has_kizu == 1 &
         data_type == 'train'
   C:
-    base: /app/github_actions/DVC/dataset
+    base: /dgx/data/raw_dataset/data
     query:
-      - product_type == 'H' &
-        is_anomaly_image == 1 &
+      - folder == '20200610093341_H_ws2tobu_anomaly' &
+        has_kizu == 1 &
         data_type == 'train'
-      - product_type == 'H' &
-        is_anomaly_image == 0 &
+      - folder == '20200611140608_H_ws2tobu_normal' &
+        has_kizu == 0 &
         data_type == 'train'
   test:
-    base: /app/github_actions/DVC/dataset
+    base: /dgx/data/raw_dataset/data
     query:
-      - product_type == 'H' &
-        is_anomaly_image == 1 &
+      - folder == '20200610093341_H_ws2tobu_anomaly' &
+        has_kizu == 1 &
         data_type == 'test'
-      - product_type == 'H' &
-        is_anomaly_image == 0 &
+      - folder == '20200610093341_H_ws2tobu_anomaly' &
+        has_kizu == 0 &
+        data_type == 'test'
+      - folder == '20200611140608_H_ws2tobu_normal' &
+        has_kizu == 0 &
         data_type == 'test'
 
 dataloader:
@@ -60,19 +63,19 @@ augs:
   height: 64
   width: 64
   S:
-    yaml: /app/github_actions/SSAD/ssad/conf/augs/train_semseg.yaml
+    yaml: /dgx/github/SSAD/ssad/conf/augs/train_semseg.yaml
     args:
       Resize:
         height: ${augs.height}
         width: ${augs.width}
   C:
-    yaml: /app/github_actions/SSAD/ssad/conf/augs/train_classifier.yaml
+    yaml: /dgx/github/SSAD/ssad/conf/augs/train_classifier.yaml
     args:
       Resize:
         height: ${augs.height}
         width: ${augs.width}
   test:
-    yaml: /app/github_actions/SSAD/ssad/conf/augs/test.yaml
+    yaml: /dgx/github/SSAD/ssad/conf/augs/test.yaml
     args:
       Resize:
         height: ${augs.height}

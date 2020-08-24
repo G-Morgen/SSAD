@@ -17,10 +17,9 @@ class BoardConfusionMatrix:
         di: dict = {"stem": [], "label": [], "pred": [], "IoU": []}
         for line in lines:
             line = line.replace("\n", "")
-            func_name = line.split(" - ")[1]
 
-            if func_name == "run_test":
-                _, _, stem, label, pred, IoU = line.split(" - ")
+            if len(line.split(" - ")) == 5:
+                _, stem, label, pred, IoU = line.split(" - ")
                 di["stem"].append(stem)
                 di["label"].append(int(label))
                 di["pred"].append(int(pred))

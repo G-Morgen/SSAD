@@ -1,5 +1,5 @@
-import ssad.typehint as T
 import ssad.losses
+import ssad.typehint as T
 
 
 class TrainerCriterion:
