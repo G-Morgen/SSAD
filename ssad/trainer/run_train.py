@@ -1,5 +1,6 @@
-from tqdm import tqdm
+import mlflow
 import torch
+from tqdm import tqdm
 
 
 class TrainerRunTrain:
@@ -26,6 +27,7 @@ class TrainerRunTrain:
             self.optimizer["S"].step()
             self.optimizer["S"].zero_grad()
             self.log.info(f"{epoch} - {loss}")
+            mlflow.log_metric("loss", loss.detach().item())
 
     def run_train_classifier(self, epoch: int) -> None:
 
@@ -44,4 +46,3 @@ class TrainerRunTrain:
             self.optimizer["C"].step()
             self.optimizer["C"].zero_grad()
             self.log.info(f"{epoch} - {loss}")
-

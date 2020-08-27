@@ -1,7 +1,7 @@
 device: cuda:0
 
 run_train:
-  epoch: 100
+  epoch: 3
   grad_enabled: False
 
 dataset:
