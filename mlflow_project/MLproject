@@ -1,0 +1,8 @@
+name: SSAD
+
+docker_env:
+    image: SSAD
+
+entry_points:
+    main:
+        command: "python run.py conf/config.yaml"
