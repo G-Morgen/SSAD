@@ -12,7 +12,7 @@ config_path = sys.argv[1]
 sys.argv.pop(1)
 
 mlflow.set_tracking_uri("databricks")
-mlflow.set_experiment("/Users/taikiinoue45@gmail.com/my-experiment")
+mlflow.set_experiment("/Users/inoue@nablas.com/ssad")
 
 
 @hydra.main(config_path)
