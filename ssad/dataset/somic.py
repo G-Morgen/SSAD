@@ -23,7 +23,7 @@ class SomicDataset(Dataset):
     def __getitem__(self, idx: int):
 
         stem = self.stems[idx]
-        img = cv2.imread(str(self.base / f"images/{stem}.bmp"))
+        img = cv2.imread(str(self.base / f"images/{stem}.jpg"))
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         mask = cv2.imread(str(self.base / f"masks/{stem}.png"), cv2.IMREAD_GRAYSCALE)
         mask = np.expand_dims(mask, axis=-1)
