@@ -6,32 +6,25 @@ run_train:
 
 dataset:
   S:
-    base: /dgx/data/raw_dataset/data
+    base: /dgx/shared/momo/inoue/DVC/dataset
     query:
-      - folder == '20200610093341_H_ws2tobu_anomaly' &
-        has_kizu == 1 &
-        data_type == 'train'
+      - is_anomaly_image == 1 &
+        crop_type == 'tobu' &
+        supervised == 'train'
   C:
-    base: /dgx/data/raw_dataset/data
+    base: /dgx/shared/momo/inoue/DVC/dataset
     query:
-      - folder == '20200610093341_H_ws2tobu_anomaly' &
-        has_kizu == 1 &
-        data_type == 'train'
-      - folder == '20200611140608_H_ws2tobu_normal' &
-        has_kizu == 0 &
-        data_type == 'train'
+      - is_anomaly_image == 1 &
+        crop_type == 'tobu' &
+        supervised == 'train'
+      - is_anomaly_product == 0 &
+        crop_type == 'tobu' &
+        supervised == 'train'
   test:
-    base: /dgx/data/raw_dataset/data
+    base: /dgx/shared/momo/inoue/DVC/dataset
     query:
-      - folder == '20200610093341_H_ws2tobu_anomaly' &
-        has_kizu == 1 &
-        data_type == 'test'
-      - folder == '20200610093341_H_ws2tobu_anomaly' &
-        has_kizu == 0 &
-        data_type == 'test'
-      - folder == '20200611140608_H_ws2tobu_normal' &
-        has_kizu == 0 &
-        data_type == 'test'
+      - crop_type == 'tobu' &
+        supervised == 'test'
 
 dataloader:
   S:

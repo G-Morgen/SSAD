@@ -4,6 +4,9 @@ import ssad.typehint as T
 
 
 class TrainerShowResult:
+
+    augs: T.Compose
+
     def show_result(
         self, stem: str, img: T.Tensor, mask: T.Tensor, label: int, semseg: T.Tensor, pred: int
     ) -> None:

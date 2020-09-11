@@ -1,6 +1,5 @@
 import os
 import sys
-from pathlib import Path
 
 import hydra
 import mlflow
@@ -27,8 +26,9 @@ def my_app(cfg: T.DictConfig) -> None:
         trainer.run_train()
 
     trainer.run_test()
+    trainer.compute_confusion_matrix()
 
-    mlflow.log_artifact(Path(".").parent)
+    # mlflow.log_artifact(Path(".").parent)
 
 
 if __name__ == "__main__":

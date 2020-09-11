@@ -4,7 +4,7 @@ from ssad import albu
 
 class TrainerAugs:
 
-    cfg: T.Path
+    cfg: T.DictConfig
 
     def init_augs(self, data_type: str) -> T.Compose:
 

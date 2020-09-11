@@ -1,8 +1,13 @@
 import torch
+
 import ssad.typehint as T
 
 
 class TrainerOptimizer:
+
+    model: T.Module
+    cfg: T.DictConfig
+
     def init_optimizer(self, model_type: str) -> T.Optimizer:
 
         params = self.model[model_type].parameters()

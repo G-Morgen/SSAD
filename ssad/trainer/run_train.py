@@ -2,8 +2,18 @@ import mlflow
 import torch
 from tqdm import tqdm
 
+import ssad.typehint as T
+
 
 class TrainerRunTrain:
+
+    cfg: T.DictConfig
+    model: T.Module
+    criterion: T.Loss
+    optimizer: T.Optimizer
+    dataloader: T.DataLoader
+    log: T.Logger
+
     def run_train(self) -> None:
 
         pbar = tqdm(range(self.cfg.run_train.epoch), desc="train")
@@ -26,8 +36,7 @@ class TrainerRunTrain:
             loss.backward()
             self.optimizer["S"].step()
             self.optimizer["S"].zero_grad()
-            self.log.info(f"{epoch} - {loss}")
-            mlflow.log_metric("loss", loss.detach().item())
+            mlflow.log_metric("train_semseg", loss.detach().item())
 
     def run_train_classifier(self, epoch: int) -> None:
 
@@ -45,4 +54,4 @@ class TrainerRunTrain:
             loss.backward()
             self.optimizer["C"].step()
             self.optimizer["C"].zero_grad()
-            self.log.info(f"{epoch} - {loss}")
+            mlflow.log_metric("train_classifier", loss.detach().item())

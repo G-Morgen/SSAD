@@ -1,4 +1,4 @@
-from typing import TypeVar, Any, List
+from typing import Any, List, TypeVar
 
 from nptyping import NDArray
 
@@ -12,3 +12,4 @@ Compose = TypeVar("stad.albu.Compose")
 Dataset = TypeVar("torch.utils.data.Dataset")
 DataFrame = TypeVar("pandas.DataFrame")
 Path = TypeVar("pathlib.Path")
+Logger = TypeVar("logging.Logger")

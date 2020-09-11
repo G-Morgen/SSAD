@@ -1,8 +1,16 @@
 import torch
 from tqdm import tqdm
 
+import ssad.typehint as T
+
 
 class TrainerRunTest:
+
+    model: T.Module
+    dataloader: T.DataLoader
+    cfg: T.DictConfig
+    log: T.Logger
+
     def run_test(self) -> None:
 
         self.model["S"].eval()
